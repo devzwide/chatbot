@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo Installing dependencies...
+      - npm install
+  pre_build:
+    commands:
+      - echo Pre-build phase complete.
+  build:
+    commands:
+      - echo Build phase complete. No build step required for this project.
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - '**/*'
+  exclude:
+    - node_modules/**
+    - .env
+    - npm-debug.log
