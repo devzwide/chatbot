@@ -1,23 +1,21 @@
 import "dotenv/config";
+import connectToDatabase from "../config/db.config.js";
 import { GoogleGenAI } from "@google/genai";
 
 const geminiController = async (req, res) => {
     try {
         const { message } = req.body;
-        const SYSTEM_INSTRUCTION_TEXT = process.env.SYSTEM_INSTRUCTION_TEXT;
+        const db = await connectToDatabase();
+        
+        const configCollection = db.collection("config");
+        const configDoc = await configCollection.findOne({ key: "system_instruction" });
+        const SYSTEM_INSTRUCTION_TEXT = configDoc.system_instruction;
+
+        const messagesCollection = db.collection("messages");
+            
         const genAI = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY});
-       
-        if (!message) {
-            return res.status(400).json({ error: "Message is required in the request body." });
-        }
-
-        if (!SYSTEM_INSTRUCTION_TEXT) {
-            return res.status(500).json({ error: "System instructions are not configured." });
-        }
-
-        const tools = [{
-            googleSearch: {},
-        }];
+        
+        const tools = [{ googleSearch: {}, }];
 
         const config = {
             thinkingConfig: {
@@ -57,14 +55,24 @@ const geminiController = async (req, res) => {
             return res.status(500).json({ error: "No response from Gemini API." });
         }
 
+        let fullResponse = "";
+
         for await (const chunk of response) {
+            fullResponse += chunk.text;
             res.write(chunk.text);
         }
 
         res.end();
 
+        await messagesCollection.insertOne({
+            userMessage: message,
+            botResponse: fullResponse,
+            timestamp: new Date(),
+        });
+
     } catch (error) {
-       if (!res.headersSent) {
+        console.error("Error in geminiController:", error);
+        if (!res.headersSent) {
             if (
                 error.message &&
                 error.message.includes("RESOURCE_EXHAUSTED")
