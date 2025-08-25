@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM devzwide/chatbot-api:latest
 WORKDIR /app
 COPY . .
 RUN npm install --production
