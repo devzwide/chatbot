@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 8000;
 server.use(helmet());
 server.use(morgan("dev"));
 server.use(express.json());
-server.use(cors({ origin: "*" }));
+server.use(cors({ origin: "https://portfolio-s8zz.onrender.com" }));
 server.use(rateLimit({ windowMs: 60 * 1000, max: 30 }));
 
 server.use("/api", router);
