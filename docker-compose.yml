@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: chatbot-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: chatbotDB
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  chatbot:
+    build: .
+    container_name: chatbot-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    environment:
+      MONGODB_CONN_STR: mongodb://mongodb:27017/chatbotDB
+
+volumes:
+  mongo_data:
