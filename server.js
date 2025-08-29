@@ -17,7 +17,7 @@ server.use(express.json());
 server.use(cors({ origin: process.env.CORS_ORIGIN }));
 server.use(rateLimit({ windowMs: 60 * 1000, max: 30 }));
 
-server.use("/", (req, res) => {
+server.get("/", (req, res) => {
   res.send("Welcome to the Chatbot API");
 });
 server.use("/api", router);
