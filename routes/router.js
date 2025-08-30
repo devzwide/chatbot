@@ -4,8 +4,12 @@ import { healthCheck } from "../controllers/status.controller.js";
 
 const router = express.Router();
 
-router.use("/chat", geminiController);
+router.get("/", (req, res) => {
+  res.send("Welcome to the Chatbot API");
+});
 
-router.use("/health", healthCheck);
+router.use("/api/chat", geminiController);
+
+router.use("/api/health", healthCheck);
 
 export default router;
